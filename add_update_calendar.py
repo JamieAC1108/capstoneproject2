@@ -9,8 +9,8 @@ DISCORD_TOKEN = os.getenv('discord_token')
 
 # UVDesk API config
 UVDESK_API_URL = "https://your-uvdesk-domain.com/en/api/tickets.json"
-UVDESK_API_KEY = "YOUR_API_KEY"
-UVDESK_API_SECRET = "YOUR_API_SECRET"
+UVDESK_API_KEY = os.getenv('apikey')
+UVDESK_API_SECRET = os.getenv('apisecret')
 
 # Bot setup
 intents = discord.Intents.default()
