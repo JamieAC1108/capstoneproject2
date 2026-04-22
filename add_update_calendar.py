@@ -4,13 +4,11 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-# თქვენი credentials
-DISCORD_TOKEN = os.getenv('discord_token')
 
-# UVDesk API config
-UVDESK_API_URL = "https://your-uvdesk-domain.com/en/api/tickets.json"
+# Load your environment variables
+DISCORD_TOKEN = os.getenv('discord_token')
+UVDESK_API_URL = os.getenv('apilink')
 UVDESK_API_KEY = os.getenv('apikey')
-UVDESK_API_SECRET = os.getenv('apisecret')
 
 # Bot setup
 intents = discord.Intents.default()
@@ -26,10 +24,10 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    print(f"Message received: {message.content}")  # Debugging print statement
     if message.author.bot:
         return
 
-    # Check prefix
     if message.content.startswith(PREFIX):
         ticket_content = message.content[len(PREFIX):].strip()
 
@@ -39,7 +37,7 @@ async def on_message(message):
 
         # Prepare UVDesk payload
         payload = {
-            "from": message.author.email if hasattr(message.author, "email") else "student@example.com",
+            "from": "student@example.com",  # Use a default or a custom method for getting email
             "subject": f"Discord Ticket from {message.author}",
             "message": ticket_content,
             "name": str(message.author)
@@ -47,11 +45,11 @@ async def on_message(message):
 
         # Send to UVDesk
         try:
-            response = requests.post(
-                UVDESK_API_URL,
-                data=payload,
-                auth=(UVDESK_API_KEY, UVDESK_API_SECRET)
-            )
+            headers = {
+                'Authorization': f'Bearer {UVDESK_API_KEY}',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+            response = requests.post(UVDESK_API_URL, data=payload, headers=headers, verify=False)
 
             if response.status_code == 200:
                 await message.channel.send("✅ Ticket created successfully!")
