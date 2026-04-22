@@ -35,6 +35,10 @@ async def on_message(message):
             await message.channel.send("Please include a message after !ticket")
             return
 
+        # Debugging the content length and structure
+        print(f"Ticket Content Length: {len(ticket_content)}")
+        print(f"Subject: {f'Discord Ticket from {message.author}'} (Length: {len(f'Discord Ticket from {message.author}')})")
+
         # Prepare UVDesk payload
         payload = {
             "from": "student@example.com",  # Use a default or a custom method for getting email
@@ -43,18 +47,23 @@ async def on_message(message):
             "name": str(message.author)
         }
 
+        # Debug print for payload
+        print("Payload being sent to UVDesk:", payload)
+
         # Send to UVDesk
         try:
             headers = {
                 'Authorization': f'Bearer {UVDESK_API_KEY}',
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'  # Change to application/json
             }
-            response = requests.post(UVDESK_API_URL, data=payload, headers=headers, verify=False)
+            response = requests.post(UVDESK_API_URL, json=payload, headers=headers, verify=False)
 
             if response.status_code == 200:
                 await message.channel.send("✅ Ticket created successfully!")
             else:
-                await message.channel.send(f"❌ Failed to create ticket: {response.text}")
+                print(f"Error response code: {response.status_code}")
+                print(f"Raw error response: {response.text}")  # Print raw response body
+                await message.channel.send(f"❌ Failed to create ticket: {response.status_code} - {response.text}")
 
         except Exception as e:
             await message.channel.send(f"⚠️ Error: {str(e)}")
