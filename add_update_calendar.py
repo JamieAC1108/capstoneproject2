@@ -31,13 +31,20 @@ async def on_message(message):
     if message.content.startswith(PREFIX):
         ticket_content = message.content[len(PREFIX):].strip()
 
+        # Debug print for ticket content
+        print(f"Ticket content (after stripping): {ticket_content}")
+
         if not ticket_content:
             await message.channel.send("Please include a message after !ticket")
             return
 
-        # Debugging the content length and structure
+        # Check if the ticket content is within Discord's limit (4000 characters)
+        if len(ticket_content) > 4000:
+            await message.channel.send("❌ Your ticket is too long. Please shorten it to 4000 characters or fewer.")
+            return
+
+        # Debug print for ticket content length
         print(f"Ticket Content Length: {len(ticket_content)}")
-        print(f"Subject: {f'Discord Ticket from {message.author}'} (Length: {len(f'Discord Ticket from {message.author}')})")
 
         # Prepare UVDesk payload
         payload = {
